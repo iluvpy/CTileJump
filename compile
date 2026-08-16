@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+H_PATH="./src/headers"
+SRC_PATH="src/*.c"
+
+
+clang -o tile-jump $SRC_PATH -L$H_PATH $(pkg-config --cflags --libs sdl2)
