@@ -2,6 +2,21 @@
 
 H_PATH="./src/headers"
 SRC_PATH="src/*.c"
+NAME="tile-jump"
+DEBUG="true"
+LIBS="-L$(pkg-config --cflags --libs sdl2)"
+FLAGS=""
 
 
-clang -o tile-jump $SRC_PATH -L$H_PATH $(pkg-config --cflags --libs sdl2)
+
+addf() {
+    FLAGS="$FLAGS $1"
+}
+
+if [[ $DEBUG == "true" ]]; then
+    addf "-g"
+fi
+
+FINAL_FLAGS=" -Werror -Wall -o $NAME $SRC_PATH $LIBS -I$H_PATH -std=c17 $FLAGS"
+echo "compiling with clang and flags: $FINAL_FLAGS"
+clang -o $FINAL_FLAGS

@@ -1,4 +1,7 @@
 #pragma once
 
-#define true 1
-#define false 0
+#include <stdbool.h>
+
+#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 300
+

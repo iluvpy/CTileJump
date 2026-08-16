@@ -1,44 +1,38 @@
 #include <SDL2/SDL.h>   // Use <SDL3/SDL.h> for SDL3
 #include <stdio.h>
+#include <stdbool.h>
 
+#include "game.h"
+#include "util.h"
 
+bool initSDL();
 
 int main(int argc, char *argv[]) {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
-        return 1;
-    }
 
+    if (!initSDL()) {
+        return -1;
+    }
     
-    SDL_Window *window = SDL_CreateWindow(
-        "My SDL App",
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        640, 480,
-        SDL_WINDOW_SHOWN
-    );
-    
-    if (!window) {
-        fprintf(stderr, "SDL_CreateWindow failed: %s\n", SDL_GetError());
-        SDL_Quit();
-        return 1;
-    }
+    GameData game;
+    GameEvents events;
+    ObjectHandler objHandler;
 
-    int running = 1;
-    SDL_Event event;
+    initGame(&game, &events, &objHandler);
+    gameLoop(&game);
 
-    while (running) {
-        // Process all pending events
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                running = 0;   // Break out of the loop
-            }
-        }
+    printf("quit game because gameLoop() finished");
 
-        SDL_Delay(10);
-    }
+    destroyGame(&game);
 
-    SDL_DestroyWindow(window);
     SDL_Quit();
     return 0;
 }
+
+bool initSDL() {
+    if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+        fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
+        return false;
+    }
+    return true;
+}
+
