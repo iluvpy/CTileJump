@@ -15,16 +15,16 @@ int main(int argc, char *argv[]) {
     
     GameData game;
     GameEvents events;
-    ObjectHandler objHandler;
+    TileHandler obj_handler;
 
-    initGame(&game, &events, &objHandler);
+    initGame(&game, &events, &obj_handler);
     gameLoop(&game);
-
-    printf("quit game because gameLoop() finished");
-
     destroyGame(&game);
 
     SDL_Quit();
+
+    printf("quit game!\n");
+
     return 0;
 }
 

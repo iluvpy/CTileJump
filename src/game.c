@@ -3,7 +3,13 @@
 
 // the loop which checks for events and renders each frame
 int gameLoop(GameData *game) {
+
+    /* test drawing tiles*/
+    SDL_Color color = {100, 100, 100, 255};
+    GameRect *grect = createGameRect(100, 300, 50, 50, color);
     
+    updateTileHandler(game->tile_handler, grect);
+
     while (!game->quit) {
         /* check events */
         updateEvents(game->events);
@@ -13,7 +19,8 @@ int gameLoop(GameData *game) {
         SDL_SetRenderDrawColor(game->renderer, 255, 255, 255, 255); 
         SDL_RenderClear(game->renderer);
 
-        /* rendering happens here */
+        /* rendering happens here */ 
+        drawTiles(game->tile_handler, game->renderer);
 
         SDL_RenderPresent(game->renderer);
 
@@ -26,7 +33,7 @@ int gameLoop(GameData *game) {
 
 
 
-void initGame(GameData *game, GameEvents *events, ObjectHandler *obj_handler) {
+void initGame(GameData *game, GameEvents *events, TileHandler *tile_handler) {
     game->quit = false;
 
     SDL_Window *window = SDL_CreateWindow(
@@ -54,8 +61,8 @@ void initGame(GameData *game, GameEvents *events, ObjectHandler *obj_handler) {
     game->window = window;
     game->renderer = renderer;
 
-    game->obj_handler = obj_handler;
-    initObjectHandler(game->obj_handler);
+    game->tile_handler = tile_handler;
+    initTileHandler(game->tile_handler);
     game->events = events;
     initGameEvents(game->events);
 
@@ -64,6 +71,6 @@ void initGame(GameData *game, GameEvents *events, ObjectHandler *obj_handler) {
 
 void destroyGame(GameData *game) {
 
-    destroyObjectHandler(game->obj_handler);
+    destroyTileHandler(game->tile_handler);
 }
 
