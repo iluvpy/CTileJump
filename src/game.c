@@ -4,16 +4,11 @@
 // the loop which checks for events and renders each frame
 int gameLoop(GameData *game) {
 
-    /* test drawing tiles*/
-    SDL_Color color = {100, 100, 100, 255};
-    GameRect *grect = createGameRect(100, 300, 50, 50, color);
-    
-    updateTileHandler(game->tile_handler, grect);
 
     while (!game->quit) {
         /* check events */
-        updateEvents(game->events);
-        game->quit = game->events->quit;
+        updateGameEvents(game->events);
+        game->quit = game->events->quit; /* check if quit */
 
         /* set white background */
         SDL_SetRenderDrawColor(game->renderer, 255, 255, 255, 255); 
@@ -21,8 +16,12 @@ int gameLoop(GameData *game) {
 
         /* rendering happens here */ 
         drawTiles(game->tile_handler, game->renderer);
+    
 
         SDL_RenderPresent(game->renderer);
+
+        /* updating physics etc */
+        updateTileHandler(game->tile_handler);
 
         SDL_Delay(10); 
 
@@ -65,7 +64,6 @@ void initGame(GameData *game, GameEvents *events, TileHandler *tile_handler) {
     initTileHandler(game->tile_handler);
     game->events = events;
     initGameEvents(game->events);
-
 }
 
 

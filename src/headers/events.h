@@ -10,5 +10,5 @@ typedef struct GameEvents {
 } GameEvents;
 
 // polls events and updates the GameEvents struct accordinglys
-void updateEvents(GameEvents *game_events);
+void updateGameEvents(GameEvents *game_events);
 void initGameEvents(GameEvents *game_events);

@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 
 // polls events and updates the GameEvents struct accordinglys
-void updateEvents(GameEvents *game_events) {
+void updateGameEvents(GameEvents *game_events) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {

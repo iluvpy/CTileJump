@@ -15,9 +15,9 @@ int main(int argc, char *argv[]) {
     
     GameData game;
     GameEvents events;
-    TileHandler obj_handler;
+    TileHandler tile_handler;
 
-    initGame(&game, &events, &obj_handler);
+    initGame(&game, &events, &tile_handler);
     gameLoop(&game);
     destroyGame(&game);
 

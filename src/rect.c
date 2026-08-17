@@ -1,4 +1,5 @@
 #include "rect.h"
+#include "util.h"
 
 GameRect *createGameRect(int x, int y, int w, int h, SDL_Color color) {
     GameRect *g_rect = malloc(sizeof(GameRect));
@@ -11,7 +12,7 @@ GameRect *createGameRect(int x, int y, int w, int h, SDL_Color color) {
     g_rect->color = malloc(sizeof(SDL_Color));
 
     g_rect->color->r = color.r;
-    g_rect->color->g = color.a;
+    g_rect->color->g = color.g;
     g_rect->color->b = color.b;
     g_rect->color->a = color.a;
 
@@ -20,10 +21,11 @@ GameRect *createGameRect(int x, int y, int w, int h, SDL_Color color) {
 
 void fillGameRect(GameRect *g_rect, SDL_Renderer *renderer) {
     SDL_SetRenderDrawColor(renderer,
-                           g_rect->color->r,
+                           g_rect->color->r, 
                            g_rect->color->g,
                            g_rect->color->b,
                            g_rect->color->a);
+    
     
     SDL_Rect sdl_rect = {
         g_rect->x, 
@@ -36,6 +38,10 @@ void fillGameRect(GameRect *g_rect, SDL_Renderer *renderer) {
 
 
 void destroyGameRect(GameRect *g_rect) {
+    if (!g_rect){
+        DEBUG_STR("destroyGameRect got NULL as ptr!\n");
+        return;
+    }
     free(g_rect->color);
     free(g_rect);
 }
