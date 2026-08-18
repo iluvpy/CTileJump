@@ -68,7 +68,8 @@ void initGame(GameData *game, GameEvents *events, TileHandler *tile_handler) {
 
 
 void destroyGame(GameData *game) {
-
+    
     destroyTileHandler(game->tile_handler);
+    game->tile_handler = NULL;
 }
 

@@ -5,12 +5,17 @@
 
 
 void initTileHandler(TileHandler *tile_handler) {
-    tile_handler->count = 0;
     tile_handler->tiles = malloc(sizeof(GameRect*));
+    tile_handler->last_tile = NULL;
+    tile_handler->count = 0;
+
 }
 
 void destroyTileHandler(TileHandler *tile_handler) {
-
+    if (tile_handler == NULL) {
+        DEBUG_STR("destroyTileHandler received NULL ptr!\n");
+        return;
+    }
     if (tile_handler->count == 0) {
         free(tile_handler->tiles);
         return;
@@ -32,12 +37,23 @@ void drawTiles(TileHandler *tile_handler, SDL_Renderer *renderer) {
 /* TODO implement update tile handler */
 void updateTileHandler(TileHandler *tile_handler) {
     
-    if (tile_handler->count < 1) {
-        p_addTile(tile_handler, 30, 30);
-        p_addTile(tile_handler, 30, 50);
+    // if (tile_handler->count < 1) {
+    //     p_addTile(tile_handler, 30, 30);
+    //     p_addTile(tile_handler, 30, 50);
+    // }
+
+    if (tile_handler->last_tile == NULL) { /* the first generation of tiles has yet to be done. */
+        int y = INITAL_TILE_HEIGHT;
+        int x = random_int(0, WINDOW_WIDTH - TILE_WIDTH); 
+        p_addTile(tile_handler, x, y);
+        tile_handler->last_tile = p_getTile(tile_handler, 0);
+        return;
     }
 
+    /* first tile already generated, now check if new tiles need to be  */
+    
 }
+
 
 void p_updateTileCount(TileHandler *tile_handler, int count) {
     int count_diff = abs(tile_handler->count - count);

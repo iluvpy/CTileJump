@@ -38,11 +38,12 @@ void fillGameRect(GameRect *g_rect, SDL_Renderer *renderer) {
 
 
 void destroyGameRect(GameRect *g_rect) {
-    if (!g_rect){
+    if (g_rect == NULL){
         DEBUG_STR("destroyGameRect got NULL as ptr!\n");
         return;
     }
     free(g_rect->color);
+    g_rect->color = NULL;
     free(g_rect);
 }
 

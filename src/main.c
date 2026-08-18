@@ -5,14 +5,17 @@
 #include "game.h"
 #include "util.h"
 
-bool initSDL();
+/* all functions with beginning with 'p_' are (or should be) private to the corresponding .c file */
 
 int main(int argc, char *argv[]) {
 
-    if (!initSDL()) {
+    if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+        fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
         return -1;
     }
-    
+
+    initUtil();
+
     GameData game;
     GameEvents events;
     TileHandler tile_handler;
@@ -26,13 +29,5 @@ int main(int argc, char *argv[]) {
     printf("quit game!\n");
 
     return 0;
-}
-
-bool initSDL() {
-    if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-        fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
-        return false;
-    }
-    return true;
 }
 
