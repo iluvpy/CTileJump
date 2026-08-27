@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    initUtil();
+    initUtil(); /* initialize anything that the utility functions need */
 
     GameData game;
     GameEvents events;

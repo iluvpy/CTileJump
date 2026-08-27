@@ -6,7 +6,7 @@
 #include "player.h"
 #include "constants.h"
 #include "events.h"
-
+#include "image.h"
 
 typedef struct GameData {
     SDL_Window *window;
@@ -14,6 +14,7 @@ typedef struct GameData {
 
     TileHandler *tile_handler;
     GameEvents *events;
+    Image *player_img;
     bool quit;
 
 } GameData;

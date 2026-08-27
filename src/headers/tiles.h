@@ -6,6 +6,8 @@
 #include "rect.h"
 #include "constants.h"
 
+#define TILES_PADDING (int)20
+
 typedef struct TileHandler {
     GameRect **tiles; 
     GameRect *last_tile;

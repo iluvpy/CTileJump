@@ -45,13 +45,22 @@ void updateTileHandler(TileHandler *tile_handler) {
     if (tile_handler->last_tile == NULL) { /* the first generation of tiles has yet to be done. */
         int y = INITAL_TILE_HEIGHT;
         int x = random_int(0, WINDOW_WIDTH - TILE_WIDTH); 
-        p_addTile(tile_handler, x, y);
-        tile_handler->last_tile = p_getTile(tile_handler, 0);
-        return;
+        p_addTile(tile_handler, x, y); /* last tile gets updated inside this function */
+        printf("added new tile!!!\n");
+        return; 
     }
 
+
+
     /* first tile already generated, now check if new tiles need to be  */
-    
+    GameRect *last_tile = p_getTile(tile_handler, tile_handler->count - 1);
+    int last_tile_y = last_tile->y;
+    if (last_tile_y > 30) { /* the last tile is below y 30, so we need to add a tile*/
+        int new_tile_x = random_int(0 + TILES_PADDING, WINDOW_WIDTH - TILE_WIDTH - TILES_PADDING);
+        int new_tile_y = last_tile_y - random_int(TILE_Y_MIN_DIST, TILE_Y_MAX_DIST);
+        p_addTile(tile_handler, new_tile_x, new_tile_y);
+
+    } 
 }
 
 
@@ -91,7 +100,8 @@ void p_addTile(TileHandler *tile_handler, int x, int y) {
 
     tile_handler->tiles = new_tiles;
     tile_handler->tiles[tile_handler->count - 1] = new_tile;
-
+    tile_handler->last_tile = new_tile;
+    printf("tile count updated, count: %d\n", tile_handler->count);  // p_addTile TODO REMOVE DEBUG PRINTF
 }
 
 GameRect *p_getTile(TileHandler *tile_handler, u_int32_t index) {

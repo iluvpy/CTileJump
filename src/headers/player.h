@@ -1,5 +1,4 @@
 #pragma once
 
-typedef struct Player {
-    
-} Player;
+#include "image.h"
+

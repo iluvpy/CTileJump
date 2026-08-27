@@ -18,7 +18,10 @@
 /* range of delta x or y when adding a new tile*/
 #define TILE_X_MAX_DIST (int)20
 #define TILE_X_MIN_DIST (int)20
-#define TILE_Y_MAX_DIST (int)20
+#define TILE_Y_MAX_DIST (int)40
 #define TILE_Y_MIN_DIST (int)20
 
 /* end tiles.h */
+
+/* PLAYER PRESET DATA */
+#define PLAYER_IMG_PATH "./assets/player.jpg"

@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
 H_PATH="./src/headers"
+BUILD_FOLDER="./build/"
 SRC_PATH="src/*.c"
 NAME="tile-jump"
 DEBUG="true"
-LIBS="-L$(pkg-config --cflags --libs sdl2)"
+LIBS="-L$(pkg-config --cflags --libs sdl2) -lSDL2_image"
 FLAGS=""
 
 
@@ -17,6 +18,6 @@ if [[ $DEBUG == "true" ]]; then
     addf "-g"
 fi
 
-FINAL_FLAGS=" -Werror -Wall -o $NAME $SRC_PATH $LIBS -I$H_PATH -std=c17 $FLAGS"
+FINAL_FLAGS=" -Werror -Wall -o "$BUILD_FOLDER$NAME" $SRC_PATH $LIBS -I$H_PATH -std=c17 $FLAGS"
 echo "compiling with clang and flags: $FINAL_FLAGS"
 clang -o $FINAL_FLAGS
