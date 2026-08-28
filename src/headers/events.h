@@ -2,7 +2,7 @@
 
 #include "constants.h"
 
-typedef struct GameEvents {
+typedef struct {
     bool pressed_space;
     bool holdLeft;
     bool holdright;

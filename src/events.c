@@ -9,7 +9,6 @@ void updateGameEvents(GameEvents *game_events) {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
             game_events->quit = true;
-            printf("quit event!"); // REMOVE
         }
     }
 }

@@ -22,6 +22,3 @@
 #define TILE_Y_MIN_DIST (int)20
 
 /* end tiles.h */
-
-/* PLAYER PRESET DATA */
-#define PLAYER_IMG_PATH "./assets/player.jpg"

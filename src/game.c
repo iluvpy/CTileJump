@@ -28,12 +28,14 @@ void initGame(GameData *game, GameEvents *events, TileHandler *tile_handler) {
 
     game->window = window;
     game->renderer = renderer;
-    game->player_img = createImage(game->renderer, 50, 50, PLAYER_IMG_PATH);
+    game->player = createPlayer(game->renderer);
 
     game->tile_handler = tile_handler;
     initTileHandler(game->tile_handler);
     game->events = events;
     initGameEvents(game->events);
+
+    game->time_handler = createTimeHandler();
 }
 
 // the loop which checks for events and renders each frame
@@ -54,11 +56,9 @@ int gameLoop(GameData *game) {
     
 
         SDL_RenderPresent(game->renderer);
+        
+        updateGame(game);
 
-        /* updating physics etc */
-        updateTileHandler(game->tile_handler);
-
-        SDL_Delay(10); 
 
     }
 
@@ -68,10 +68,17 @@ int gameLoop(GameData *game) {
 void drawGame(GameData *game) {
 
     drawTiles(game->tile_handler, game->renderer);
-    drawImage(game->player_img, game->renderer);
+    drawPlayer(game->player, game->renderer);
+    
 }
 
-
+void updateGame(GameData *game) {
+    dt_start(game->time_handler);
+    updateTileHandler(game->tile_handler);
+    updatePlayer(game->player, game->time_handler);
+    SDL_Delay(10); 
+    dt_end(game->time_handler);
+}
 
 
 
@@ -79,6 +86,8 @@ void destroyGame(GameData *game) {
     
     destroyTileHandler(game->tile_handler);
     game->tile_handler = NULL;
-    destroyImage(game->player_img);
+    destroyPlayer(game->player);
+    destroyTimeHandler(game->time_handler);
+
 }
 

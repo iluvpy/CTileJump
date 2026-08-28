@@ -2,7 +2,7 @@
 
 #include <SDL2/SDL.h>
 
-typedef struct GameRect {
+typedef struct {
     int x, y, w, h;
     SDL_Color *color;
 } GameRect;

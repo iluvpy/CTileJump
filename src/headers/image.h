@@ -13,6 +13,9 @@ typedef struct {
 } Image;
 
 Image *createImage(SDL_Renderer *renderer, int x, int y, const char *image_path);
-void imageSetPos(Image *image, int x, int y); 
-void drawImage(Image *image, SDL_Renderer *renderer);
+void setImagePos(Image *image, int x, int y); 
+void drawFullImage(Image *image, SDL_Renderer *renderer);
+void drawClippedImage(Image *image, SDL_Renderer *renderer, SDL_Rect *rect);
+void setImageScale(Image * image, float scale);
+SDL_Rect imageToSDLRect(Image *image);
 void destroyImage(Image *image);

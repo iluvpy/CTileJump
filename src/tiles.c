@@ -1,8 +1,9 @@
 #include "tiles.h"
 
 #include "util.h"
+#include "debug.h"
 
-
+const int TILES_PADDING = 20;
 
 void initTileHandler(TileHandler *tile_handler) {
     tile_handler->tiles = malloc(sizeof(GameRect*));

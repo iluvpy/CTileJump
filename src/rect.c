@@ -1,5 +1,6 @@
 #include "rect.h"
 #include "util.h"
+#include "debug.h"
 
 GameRect *createGameRect(int x, int y, int w, int h, SDL_Color color) {
     GameRect *g_rect = malloc(sizeof(GameRect));

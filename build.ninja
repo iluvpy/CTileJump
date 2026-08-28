@@ -1,0 +1,22 @@
+cflags = -std=c17 -O0 -Wall -Werror -g -DDEBUG -I./src/headers/
+cc = clang
+
+rule cc
+  command = $cc -c $in -o $out $cflags
+
+rule link
+  command = $cc $in -o $out -lSDL2 -lSDL2_image
+
+build obj/game.o: cc src/game.c  
+build obj/events.o: cc src/events.c  
+build obj/rect.o: cc src/rect.c 
+build obj/image.o: cc src/image.c  
+build obj/tiles.o: cc src/tiles.c 
+build obj/util.o: cc src/util.c 
+build obj/player.o: cc src/player.c
+build obj/timeHandler.o: cc src/timeHandler.c
+
+build obj/main.o: cc src/main.c  
+
+build build/tile-jump : link obj/game.o obj/events.o obj/rect.o obj/image.o obj/tiles.o obj/util.o obj/player.o obj/timeHandler.o obj/main.o
+

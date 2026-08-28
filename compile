@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+
 H_PATH="./src/headers"
 BUILD_FOLDER="./build/"
 SRC_PATH="src/*.c"

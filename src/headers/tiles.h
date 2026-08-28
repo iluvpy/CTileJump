@@ -6,9 +6,9 @@
 #include "rect.h"
 #include "constants.h"
 
-#define TILES_PADDING (int)20
+extern const int TILES_PADDING;
 
-typedef struct TileHandler {
+typedef struct {
     GameRect **tiles; 
     GameRect *last_tile;
     uint16_t count;
