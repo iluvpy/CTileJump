@@ -11,7 +11,7 @@ Image *createImage(SDL_Renderer *renderer, int x, int y, const char *image_path)
         DEBUG_STR("failed to load player texture...\n");
     }
 
-    setImagePos(image, x, y);
+    setImagePosOnScreen(image, x, y);
 
     int w, h;
     SDL_QueryTexture(image->texture, NULL, NULL, &w, &h);
@@ -45,7 +45,7 @@ SDL_Rect imageToSDLRect(Image *image) {
     return tmp_rect;
 }
 
-void setImagePos(Image *image, int x, int y) {
+void setImagePosOnScreen(Image *image, int x, int y) {
     image->x = x;
     image->y = y;
 }

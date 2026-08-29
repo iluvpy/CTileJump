@@ -75,8 +75,8 @@ void drawGame(GameData *game) {
 void updateGame(GameData *game) {
     dt_start(game->time_handler);
     updateTileHandler(game->tile_handler);
-    updatePlayer(game->player, game->time_handler);
-    SDL_Delay(10); 
+    updatePlayer(game->player, game->events, game->time_handler->dt);
+    SDL_Delay(1); 
     dt_end(game->time_handler);
 }
 

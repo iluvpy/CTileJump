@@ -47,7 +47,6 @@ void updateTileHandler(TileHandler *tile_handler) {
         int y = INITAL_TILE_HEIGHT;
         int x = random_int(0, WINDOW_WIDTH - TILE_WIDTH); 
         p_addTile(tile_handler, x, y); /* last tile gets updated inside this function */
-        printf("added new tile!!!\n");
         return; 
     }
 
@@ -102,7 +101,6 @@ void p_addTile(TileHandler *tile_handler, int x, int y) {
     tile_handler->tiles = new_tiles;
     tile_handler->tiles[tile_handler->count - 1] = new_tile;
     tile_handler->last_tile = new_tile;
-    printf("tile count updated, count: %d\n", tile_handler->count);  // p_addTile TODO REMOVE DEBUG PRINTF
 }
 
 GameRect *p_getTile(TileHandler *tile_handler, u_int32_t index) {

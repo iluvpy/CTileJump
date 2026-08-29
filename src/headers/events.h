@@ -6,6 +6,8 @@ typedef struct {
     bool pressed_space;
     bool holdLeft;
     bool holdright;
+    bool was_holdingLeft;
+    bool was_holdingright;
     bool quit;
 } GameEvents;
 

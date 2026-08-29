@@ -3,7 +3,7 @@
 #include <time.h>
 
 typedef struct {
-    double dt_ms;
+    double dt;
     struct timespec start, end;
 } TimeHandler;
 
