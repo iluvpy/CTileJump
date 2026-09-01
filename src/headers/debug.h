@@ -6,12 +6,12 @@
     #define DEBUG /* TODO comment out to delete debug messages */
 #endif
 
-#ifndef DEBUG_CODE  
+#ifndef DEBUG_CODE   /* TODO comment out to remove extra debug info*/
     #define DEBUG_CODE
 #endif
 
-#if defined(DEBUG_CODE) && !defined(DEBUG_THIS)
-    #define DEBUG_THIS(code) code
+#if defined(DEBUG_CODE) && !defined(ON_DEBUG)
+    #define ON_DEBUG(code) code
 #endif
 
 #ifdef DEBUG

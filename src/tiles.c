@@ -4,7 +4,7 @@
 #include "debug.h"
 
 const int TILES_PADDING = 20;
-const int TILE_SPEED = 200; /* pixels per second*/
+const int TILE_SPEED = 100; /* pixels per second*/
 const int INITIAL_TILE_HEIGHT = WINDOW_HEIGHT - 50;
 
 void initTileHandler(TileHandler *tile_handler) {
@@ -34,6 +34,12 @@ void destroyTileHandler(TileHandler *tile_handler) {
 void drawTiles(TileHandler *tile_handler, SDL_Renderer *renderer) {
     for (int i = 0; i < tile_handler->count; i++) {
         fillGameRect(tile_handler->tiles[i], renderer);
+        
+        ON_DEBUG(
+            SDL_Rect collision = getTileCollisionRect(tile_handler->tiles[i]);
+            SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+            SDL_RenderDrawRect(renderer, &collision);
+        )
     }
 }
 
@@ -55,7 +61,7 @@ void updateTileHandler(TileHandler *tile_handler, double dt) {
 
 
     /* first tile already generated, now check if new tiles need to be  */
-    GameRect *last_tile = p_getTile(tile_handler, tile_handler->count - 1);
+    GameRect *last_tile = getTile(tile_handler, tile_handler->count - 1);
     int last_tile_y = last_tile->y;
     if (last_tile_y > 30) { /* the last tile is below y 30, so we need to add a tile*/
         int new_tile_x = random_int(0 + TILES_PADDING, WINDOW_WIDTH - TILE_WIDTH - TILES_PADDING);
@@ -65,7 +71,7 @@ void updateTileHandler(TileHandler *tile_handler, double dt) {
     } 
 
     for (int i = 0; i < tile_handler->count; i++) {
-        GameRect *tile = p_getTile(tile_handler, i);
+        GameRect *tile = getTile(tile_handler, i);
         tile->y += TILE_SPEED * dt;
 
         if (tile->y > WINDOW_HEIGHT && i == 0) {
@@ -129,18 +135,30 @@ void p_addTile(TileHandler *tile_handler, int x, int y) {
     tile_handler->last_tile = new_tile;
 }
 
-GameRect *p_getTile(TileHandler *tile_handler, u_int32_t index) {
+GameRect *getTile(TileHandler *tile_handler, u_int32_t index) {
     if (index < tile_handler->count) {
         return tile_handler->tiles[index];
     }
     return NULL;
 }
 
+/* the collision rect stands a little bit above the actually visible tile */
+SDL_Rect getTileCollisionRect(GameRect *tile) {
+    SDL_Rect collision_rect = {
+        tile->x - 5,
+        tile->y - TILE_HEIGHT,
+        tile->w + 10, 
+        tile->h + TILE_HEIGHT / 2
+    };
+
+    return collision_rect;
+}
+
 
 bool p_checkAddTiles(TileHandler *tile_handler) {
     GameRect *tile;
     int last_tile_index = tile_handler->count - 1;
-    if ((tile = p_getTile(tile_handler, last_tile_index))) {
+    if ((tile = getTile(tile_handler, last_tile_index))) {
 
     }
     return true;

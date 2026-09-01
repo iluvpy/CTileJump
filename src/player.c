@@ -11,35 +11,35 @@
 const char *SPRITE_SHEET_PATH = "./assets/player.png";
 const int PLAYER_SPRITE_WIDTH_HEIGHT = 64;
 
-const int PLAYER_FORWARD = 1;
-const int MAX_PLAYER_SPEED_X = 200; /* 80 pixels/second */
-const int MAX_PLAYER_SPEED_Y = 800; /* 80 pixels/second */
+const int MAX_PLAYER_SPEED_X = 200; /* pixels/second */
+const int MAX_PLAYER_SPEED_Y = 800; /* pixels/second */
 const float SPRITE_SCALE = .2f;
 
-/* 
-    these are to be adjusted based on what sprite size one uses,
-    and based on how much of the sprite is transparent
-*/
-const int PLAYER_WIDTH = PLAYER_SPRITE_WIDTH_HEIGHT * SPRITE_SCALE; 
-/* for transparent part of sprite */
-const int PLAYER_TRANSPARENT_PADDING = 25;
-const int PLAYER_TRANSPARENT_PADDING_Y = 25 * 1.3;
 
-/* PLAYER-IMAGE X,Y,W,H OFFSETS*/
+/* PLAYER-IMAGE X,Y,W,H OFFSETS
+   since part of the texture is transparent these are needed
+*/
+
+// const float OFFSET_CREATED_AT_SCALE = .2; /* DO NOT TOUCH THIS*/
 const int PLAYER_IMAGE_X_OFFSET = 10;
-const int PLAYER_IMAGE_Y_OFFSET = 7;
+const int PLAYER_IMAGE_Y_OFFSET = 7; 
 const int PLAYER_IMAGE_W_OFFSET = -35;
 const int PLAYER_IMAGE_H_OFFSET = -22;
+
+// change this to change sprite scale
+
+
+const int ACTUAL_PLAYER_WIDTH = PLAYER_SPRITE_WIDTH_HEIGHT + PLAYER_IMAGE_W_OFFSET;
+const int ACTUAL_PLAYER_HEIGHT = PLAYER_SPRITE_WIDTH_HEIGHT + PLAYER_IMAGE_H_OFFSET;
 
 /* current direction the player is accelerating toward*/
 const char MOVE_LEFT = 1;
 const char MOVE_RIGHT = 2;
 const char MOVE_UP = 3;
 
-
+/* physics */
 const double PLAYER_GRAVITY = 300; 
 const double PLAYER_JUMP_SPEED = 300; /* pixels/second */
-
 const double PLAYER_DECELERATION = .2; /* lose 80% of velocity when releasing A or D key */
 
 Player *createPlayer(SDL_Renderer *renderer) {
@@ -50,12 +50,18 @@ Player *createPlayer(SDL_Renderer *renderer) {
     new_player->current_sprite_indexI = 0;
     new_player->current_sprite_indexJ = 0;
 
-    new_player->x = 0;
-    new_player->y = 0;
+    new_player->x = PLAYER_IMAGE_X_OFFSET;
+    new_player->y = PLAYER_IMAGE_Y_OFFSET;
 
     new_player->dx = 0;
     new_player->dy = 0;
     new_player->on_tile = false;
+    SDL_Rect collision_rect;
+    collision_rect.x = new_player->x;
+    collision_rect.y = new_player->y;
+    collision_rect.w = ACTUAL_PLAYER_WIDTH;
+    collision_rect.h = ACTUAL_PLAYER_HEIGHT;
+    new_player->collision_rect = collision_rect;
     setImageScale(new_player->sprite_sheet, SPRITE_SCALE);
     return new_player;
 }
@@ -71,16 +77,25 @@ void drawPlayer(Player *player, SDL_Renderer *renderer) {
         PLAYER_SPRITE_WIDTH_HEIGHT
     };
     
+    /* image position is updated in updatePlayer */
     drawClippedImage(player->sprite_sheet, renderer, &clip_rect);
 
-    DEBUG_THIS(
-        /* draw rect showing collision border */
-        clip_rect.x = player->x + PLAYER_IMAGE_X_OFFSET;
-        clip_rect.y = player->y + PLAYER_IMAGE_Y_OFFSET;
-        clip_rect.w += PLAYER_IMAGE_W_OFFSET;
-        clip_rect.h += PLAYER_IMAGE_H_OFFSET;
-        SDL_SetRenderDrawColor(renderer, 200, 50, 50, 255);
-        SDL_RenderDrawRect(renderer, &clip_rect);
+    ON_DEBUG(
+        /* draw collision rect */
+        SDL_Rect collision_rect = p_getPlayerCollisionRect(player);
+        int r = 255;
+        int g = 50;
+        if (player->on_tile)
+            r = 50; g = 250;
+        SDL_SetRenderDrawColor(renderer, r, g, 50, 255);
+        SDL_RenderDrawRect(renderer, &collision_rect);
+
+        /* draw Texture Rect*/
+        SDL_Rect texture_rect = clip_rect;
+        texture_rect.x = player->x - PLAYER_IMAGE_X_OFFSET;
+        texture_rect.y = player->y - PLAYER_IMAGE_Y_OFFSET;
+        SDL_SetRenderDrawColor(renderer, 50, 255, 50, 255);
+        SDL_RenderDrawRect(renderer, &texture_rect);
     )
 }
 
@@ -88,13 +103,24 @@ void updatePlayer(Player *player, TileHandler *tile_handler, GameEvents *events,
     double new_x = p_calcNextPlayerPos(player->x, player->dx, dt); 
     double new_y = p_calcNextPlayerPos(player->y, player->dy, dt);
 
-    if (p_playerInsindeGameWin(new_x, player->y)) {
+
+    if (p_playerInsindeGameWin(
+        new_x, 
+        player->y, 
+        player->collision_rect.w, 
+        player->collision_rect.h
+    )) {
         player->x = new_x;
     }
 
-    if (p_playerInsindeGameWin(player->x, new_y)) {
+    if (p_playerInsindeGameWin(
+        player->x, 
+        new_y,
+        player->collision_rect.w,
+        player->collision_rect.h
+    )) {
         player->y = new_y;
-    } else if (player->y <= 20) { /* player has hit the top of the window */
+    } else if (new_y <= 0) { /* player has hit the top of the window */
         player->dy = 0;
     }
 
@@ -105,12 +131,20 @@ void updatePlayer(Player *player, TileHandler *tile_handler, GameEvents *events,
     p_updatePlayerGravity(player, dt);
 
 
-    setImagePosOnScreen(player->sprite_sheet, (int)player->x, (int)player->y);
+    setImagePosOnScreen(
+        player->sprite_sheet, 
+        (int)player->x - PLAYER_IMAGE_X_OFFSET, 
+        (int)player->y - PLAYER_IMAGE_Y_OFFSET
+    );
+
+    player->collision_rect.x = (int)player->x;
+    player->collision_rect.y = (int)player->x;
+    player->on_tile = p_onTile(player, tile_handler);
 }
 
 
 void p_handlePlayerInput(Player *player, GameEvents *events) {
-    if (events->pressed_space) {
+    if (events->pressed_space && player->on_tile) {
         player->dy = -PLAYER_JUMP_SPEED;
     }
     if (events->holdLeft) {
@@ -152,11 +186,11 @@ void p_updatePlayerGravity(Player *player, double dt) {
     }
 }
 
-bool p_playerInsindeGameWin(double x, double y) {
+bool p_playerInsindeGameWin(double x, double y, double w, double h) {
     return x >= 0 && 
            y >= 0 &&
-           x + PLAYER_WIDTH + PLAYER_TRANSPARENT_PADDING <= WINDOW_WIDTH &&
-           y + PLAYER_WIDTH + PLAYER_TRANSPARENT_PADDING_Y  <= WINDOW_HEIGHT;
+           x + w <= WINDOW_WIDTH &&
+           y + h  <= WINDOW_HEIGHT;
 }
 
 double p_calcNextPlayerPos(double oldPos, double speed, double dt) {
@@ -164,8 +198,25 @@ double p_calcNextPlayerPos(double oldPos, double speed, double dt) {
 }
 
 bool p_onTile(Player *player, TileHandler *tile_handler) {
+    
+    for (int i = 0; i < tile_handler->count; i++) {
+        GameRect *tile = getTile(tile_handler, i);
+        SDL_Rect tile_collision = getTileCollisionRect(tile);
 
+        if (rect_collision(tile_collision, player->collision_rect)) {
+            return tile->y >= player->y;
+        }
+    }
     return false;
+}
+
+SDL_Rect p_getPlayerCollisionRect(Player *player) {
+    SDL_Rect collision_rect;
+    collision_rect.x = player->x;
+    collision_rect.y = player->y;
+    collision_rect.w = PLAYER_SPRITE_WIDTH_HEIGHT + PLAYER_IMAGE_W_OFFSET;
+    collision_rect.h = PLAYER_SPRITE_WIDTH_HEIGHT + PLAYER_IMAGE_H_OFFSET;
+    return collision_rect;
 }
 
 

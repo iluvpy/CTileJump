@@ -22,6 +22,7 @@ typedef struct {
     int current_sprite_indexI;
     int current_sprite_indexJ;
     bool on_tile;
+    SDL_Rect collision_rect;
     Image *sprite_sheet;
 } Player;
 
@@ -33,6 +34,9 @@ void p_movePlayer(Player *player, char direction);
 void p_handlePlayerInput(Player *player, GameEvents *events);
 
 void p_updatePlayerGravity(Player *player, double dt);
-bool p_playerInsindeGameWin(double x, double y);
+
+bool p_playerInsindeGameWin(double x, double y, double w, double h);
 bool p_onTile(Player *player, TileHandler *tile_handler);
+SDL_Rect p_getPlayerCollisionRect(Player *player);
+
 void p_destroyPlayer(Player *player);

@@ -10,7 +10,7 @@
 
 int main(int argc, char *argv[]) {
 
-    DEBUG_THIS(
+    ON_DEBUG(
         printf("extra debug info is active\n");
         fflush(stdout);
     )

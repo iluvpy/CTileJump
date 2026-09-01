@@ -22,8 +22,9 @@ void drawTiles(TileHandler *tile_handler, SDL_Renderer *renderer);
 void p_addTile(TileHandler *tile_handler, int x, int y);
 void p_updateTileCount(TileHandler *tile_handler, int count);
 bool p_checkAddTiles(TileHandler *tile_handler);
+SDL_Rect getTileCollisionRect(GameRect *tile);
 void p_deleteTileAt(TileHandler *tile_handler, int i);
-GameRect *p_getTile(TileHandler *tile_handler, u_int32_t index);
+GameRect *getTile(TileHandler *tile_handler, u_int32_t index);
 
 
 // frees the space the object handler has used
