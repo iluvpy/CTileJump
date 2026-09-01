@@ -9,7 +9,6 @@
 /* tiles.h */
 #define TILE_HEIGHT (int)5
 #define TILE_WIDTH (int)20
-#define INITAL_TILE_HEIGHT (int)(WINDOW_HEIGHT - 50)
 #define TILE_R (int)100
 #define TILE_G (int)100
 #define TILE_B (int)100

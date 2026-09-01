@@ -1,6 +1,5 @@
 #include "image.h"
-#include "util.h"
-#include "debug.h"
+
 
 Image *createImage(SDL_Renderer *renderer, int x, int y, const char *image_path) {
 

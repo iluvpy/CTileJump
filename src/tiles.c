@@ -4,6 +4,8 @@
 #include "debug.h"
 
 const int TILES_PADDING = 20;
+const int TILE_SPEED = 200; /* pixels per second*/
+const int INITIAL_TILE_HEIGHT = WINDOW_HEIGHT - 50;
 
 void initTileHandler(TileHandler *tile_handler) {
     tile_handler->tiles = malloc(sizeof(GameRect*));
@@ -36,7 +38,7 @@ void drawTiles(TileHandler *tile_handler, SDL_Renderer *renderer) {
 }
 
 /* TODO implement update tile handler */
-void updateTileHandler(TileHandler *tile_handler) {
+void updateTileHandler(TileHandler *tile_handler, double dt) {
     
     // if (tile_handler->count < 1) {
     //     p_addTile(tile_handler, 30, 30);
@@ -44,7 +46,7 @@ void updateTileHandler(TileHandler *tile_handler) {
     // }
 
     if (tile_handler->last_tile == NULL) { /* the first generation of tiles has yet to be done. */
-        int y = INITAL_TILE_HEIGHT;
+        int y = INITIAL_TILE_HEIGHT;
         int x = random_int(0, WINDOW_WIDTH - TILE_WIDTH); 
         p_addTile(tile_handler, x, y); /* last tile gets updated inside this function */
         return; 
@@ -61,8 +63,32 @@ void updateTileHandler(TileHandler *tile_handler) {
         p_addTile(tile_handler, new_tile_x, new_tile_y);
 
     } 
+
+    for (int i = 0; i < tile_handler->count; i++) {
+        GameRect *tile = p_getTile(tile_handler, i);
+        tile->y += TILE_SPEED * dt;
+
+        if (tile->y > WINDOW_HEIGHT && i == 0) {
+            /* this tile is always i=0*/
+            /* move array memory by +1*/
+            p_deleteTileAt(tile_handler, i);
+        }
+    }
+
 }
 
+void p_deleteTileAt(TileHandler *tile_handler, int i) {
+    destroyGameRect(tile_handler->tiles[i]);
+
+    memmove(
+        &tile_handler->tiles[i],
+        &tile_handler->tiles[i + 1],
+        (tile_handler->count - i - 1) * sizeof(GameRect*)
+    );
+
+    p_updateTileCount(tile_handler, tile_handler->count - 1);
+
+}
 
 void p_updateTileCount(TileHandler *tile_handler, int count) {
     int count_diff = abs(tile_handler->count - count);

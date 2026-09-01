@@ -4,6 +4,8 @@
 #include <SDL2/SDL_image.h>
 
 #include "rect.h"
+#include "util.h"
+#include "debug.h"
 
 typedef struct {
     int x, y;

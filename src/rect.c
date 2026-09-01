@@ -2,7 +2,7 @@
 #include "util.h"
 #include "debug.h"
 
-GameRect *createGameRect(int x, int y, int w, int h, SDL_Color color) {
+GameRect *createGameRect(double x, double y, double w, double h, SDL_Color color) {
     GameRect *g_rect = malloc(sizeof(GameRect));
 
     g_rect->x = x;
@@ -29,11 +29,12 @@ void fillGameRect(GameRect *g_rect, SDL_Renderer *renderer) {
     
     
     SDL_Rect sdl_rect = {
-        g_rect->x, 
-        g_rect->y, 
-        g_rect->w, 
-        g_rect->h 
+        (int)g_rect->x, 
+        (int)g_rect->y, 
+        (int)g_rect->w, 
+        (int)g_rect->h 
     };
+    
     SDL_RenderFillRect(renderer, &sdl_rect);
 }
 

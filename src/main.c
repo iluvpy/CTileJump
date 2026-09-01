@@ -5,9 +5,15 @@
 #include "game.h"
 #include "util.h"
 
+
 /* all functions with beginning with 'p_' are (or should be) private to the corresponding .c file */
 
 int main(int argc, char *argv[]) {
+
+    DEBUG_THIS(
+        printf("extra debug info is active\n");
+        fflush(stdout);
+    )
 
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());

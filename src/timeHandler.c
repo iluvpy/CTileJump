@@ -1,5 +1,6 @@
 
-#define _POSIX_C_SOURCE 199309L /*for clock_gettime*/
+
+#define _POSIX_C_SOURCE 199309L /*for clock_gettime, other OS might need other solutions*/
 
 #include "timeHandler.h"
 #include "debug.h"
@@ -16,12 +17,14 @@ TimeHandler *createTimeHandler() {
 void dt_start(TimeHandler *time_handler) {
     clock_gettime(CLOCK_MONOTONIC, &time_handler->start);
 }
+
+/* DO NOT TOUCH, BREAKS EVERYTIME */
 void dt_end(TimeHandler *time_handler) {
     clock_gettime(CLOCK_MONOTONIC, &time_handler->end);
     time_handler->dt = (time_handler->end.tv_sec - time_handler->start.tv_sec) * 1000.0 +
                           (time_handler->end.tv_nsec - time_handler->start.tv_nsec) / 1.0e6;
-    time_handler->dt /= 1000;
     
+    time_handler->dt /= 1000;
 }
 
 void destroyTimeHandler(TimeHandler *handler) {

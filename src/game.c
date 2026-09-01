@@ -73,11 +73,15 @@ void drawGame(GameData *game) {
 }
 
 void updateGame(GameData *game) {
-    dt_start(game->time_handler);
-    updateTileHandler(game->tile_handler);
-    updatePlayer(game->player, game->events, game->time_handler->dt);
+
+    dt_start(game->time_handler); /* start dt timer for this frame*/
+
+    updateTileHandler(game->tile_handler, game->time_handler->dt);
+    updatePlayer(game->player, game->tile_handler, game->events, game->time_handler->dt);
+    
     SDL_Delay(1); 
-    dt_end(game->time_handler);
+
+    dt_end(game->time_handler); /* end dt timer for this frame */
 }
 
 
@@ -86,7 +90,7 @@ void destroyGame(GameData *game) {
     
     destroyTileHandler(game->tile_handler);
     game->tile_handler = NULL;
-    destroyPlayer(game->player);
+    p_destroyPlayer(game->player);
     destroyTimeHandler(game->time_handler);
 
 }

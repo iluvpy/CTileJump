@@ -1,13 +1,16 @@
 #pragma once
 
 #include "constants.h"
+#include "util.h"
 
 typedef struct {
     bool pressed_space;
-    bool holdLeft;
-    bool holdright;
-    bool was_holdingLeft;
-    bool was_holdingright;
+    bool released_left;
+    bool released_right;
+    bool holdLeft; /* A key */
+    bool holdright; /* D key */
+    // bool was_holdingLeft;
+    // bool was_holdingright;
     bool quit;
 } GameEvents;
 
