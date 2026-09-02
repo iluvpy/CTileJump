@@ -47,6 +47,8 @@ Player *createPlayer(SDL_Renderer *renderer) {
 
     Image *new_sprite_sheet = createImage(renderer, 0, 0, SPRITE_SHEET_PATH);
     new_player->sprite_sheet = new_sprite_sheet;   
+    setImageScale(new_player->sprite_sheet, SPRITE_SCALE);
+
     new_player->current_sprite_indexI = 0;
     new_player->current_sprite_indexJ = 0;
 
@@ -55,14 +57,18 @@ Player *createPlayer(SDL_Renderer *renderer) {
 
     new_player->dx = 0;
     new_player->dy = 0;
-    new_player->on_tile = false;
+    new_player->can_jump = false;
+    new_player->can_fall = true;
+    new_player->is_moving = false;
+
     SDL_Rect collision_rect;
     collision_rect.x = new_player->x;
     collision_rect.y = new_player->y;
     collision_rect.w = ACTUAL_PLAYER_WIDTH;
     collision_rect.h = ACTUAL_PLAYER_HEIGHT;
     new_player->collision_rect = collision_rect;
-    setImageScale(new_player->sprite_sheet, SPRITE_SCALE);
+
+    new_player->should_jump = false;
     return new_player;
 }
 
@@ -85,10 +91,10 @@ void drawPlayer(Player *player, SDL_Renderer *renderer) {
         SDL_Rect collision_rect = p_getPlayerCollisionRect(player);
         int r = 255;
         int g = 50;
-        if (player->on_tile)
+        if (player->can_jump) /* change color when can_jump*/
             r = 50; g = 250;
         SDL_SetRenderDrawColor(renderer, r, g, 50, 255);
-        SDL_RenderDrawRect(renderer, &collision_rect);
+        drawThickRect(renderer, collision_rect, DEBUG_LINE_THICKNESS);
 
         /* draw Texture Rect*/
         SDL_Rect texture_rect = clip_rect;
@@ -100,6 +106,14 @@ void drawPlayer(Player *player, SDL_Renderer *renderer) {
 }
 
 void updatePlayer(Player *player, TileHandler *tile_handler, GameEvents *events,  double dt) {
+
+    /* key presses */
+    p_handlePlayerInput(player, events);
+
+    /* physics */
+    p_updatePlayerGravity(player, dt);
+    
+    // calculate next player position based on velocity (dx, dy) and time passed in last frame
     double new_x = p_calcNextPlayerPos(player->x, player->dx, dt); 
     double new_y = p_calcNextPlayerPos(player->y, player->dy, dt);
 
@@ -124,13 +138,20 @@ void updatePlayer(Player *player, TileHandler *tile_handler, GameEvents *events,
         player->dy = 0;
     }
 
-    /* key presses */
-    p_handlePlayerInput(player, events);
+    /* if player can jump */
+    player->can_jump = p_canPlayerJump(player, tile_handler);
 
-    /* physics */
-    p_updatePlayerGravity(player, dt);
+    SDL_Rect next_collision_rect = player->collision_rect;
+    next_collision_rect.x = new_x;
+    next_collision_rect.x = new_y;
 
+    /* disable/enable gravity */
+    player->can_fall = p_canPlayerFall(next_collision_rect, tile_handler);
 
+    /* 
+       update the player sprite position on screen adjusting with offset, 
+       since the image has transparent parts
+    */
     setImagePosOnScreen(
         player->sprite_sheet, 
         (int)player->x - PLAYER_IMAGE_X_OFFSET, 
@@ -138,15 +159,25 @@ void updatePlayer(Player *player, TileHandler *tile_handler, GameEvents *events,
     );
 
     player->collision_rect.x = (int)player->x;
-    player->collision_rect.y = (int)player->x;
-    player->on_tile = p_onTile(player, tile_handler);
+    player->collision_rect.y = (int)player->y;
+
+    player->is_moving = p_playerIsMoving(player);
 }
 
 
 void p_handlePlayerInput(Player *player, GameEvents *events) {
-    if (events->pressed_space && player->on_tile) {
-        player->dy = -PLAYER_JUMP_SPEED;
+
+    if (events->pressed_space && player->can_jump) {
+        player->should_jump = true;
+        printf("space was pressed.\n");
     }
+
+    
+    if (player->should_jump && player->can_jump) {
+        player->dy = -PLAYER_JUMP_SPEED;
+        player->should_jump = false;
+    }
+
     if (events->holdLeft) {
         p_movePlayer(player, MOVE_LEFT);
     } 
@@ -180,6 +211,7 @@ void p_movePlayer(Player *player, char direction) {
 }
 
 void p_updatePlayerGravity(Player *player, double dt) {
+    if (!player->can_fall) return;
     double new_dy = player->dy + PLAYER_GRAVITY * dt;
     if (new_dy <= MAX_PLAYER_SPEED_Y) {
         player->dy = new_dy;
@@ -193,21 +225,46 @@ bool p_playerInsindeGameWin(double x, double y, double w, double h) {
            y + h  <= WINDOW_HEIGHT;
 }
 
-double p_calcNextPlayerPos(double oldPos, double speed, double dt) {
-    return oldPos + dt * speed; /* ms to second conversion through 1000 division */
+/* 
+    if the next player position (of the next frame) collides with the actual tile (not collision rect)
+*/
+
+bool p_canPlayerFall(SDL_Rect next_collision_rect, TileHandler *tile_handler) {
+
+    for (int i = 0; i < tile_handler->count; i++) {
+        GameRect *tile = getTile(tile_handler, i);
+        
+        SDL_Rect r = getTileJumpingCollisionRect(tile);
+        r.y -= TILE_HEIGHT;
+
+        if (rect_collision(r, next_collision_rect)) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
-bool p_onTile(Player *player, TileHandler *tile_handler) {
+double p_calcNextPlayerPos(double oldPos, double speed, double dt) {
+    return oldPos + dt * speed; 
+}
+
+bool p_canPlayerJump(Player *player, TileHandler *tile_handler) {
     
     for (int i = 0; i < tile_handler->count; i++) {
         GameRect *tile = getTile(tile_handler, i);
-        SDL_Rect tile_collision = getTileCollisionRect(tile);
+        SDL_Rect tile_collision = getTileJumpingCollisionRect(tile);
 
         if (rect_collision(tile_collision, player->collision_rect)) {
-            return tile->y >= player->y;
+            return (tile->y + TILE_HEIGHT * 2) >= player->y + player->collision_rect.h;
         }
     }
     return false;
+}
+
+bool p_playerIsMoving(Player *player) {
+
+    return abs((int)(player->dx * 10)) == 0 && abs((int)(player->dy * 10)) == 0;
 }
 
 SDL_Rect p_getPlayerCollisionRect(Player *player) {

@@ -4,10 +4,12 @@
 
 #include "tiles.h"
 #include "player.h"
-#include "constants.h"
 #include "events.h"
 #include "player.h"
 #include "timeHandler.h"
+
+#define WINDOW_HEIGHT 650
+#define WINDOW_WIDTH 250
 
 typedef struct {
     SDL_Window *window;

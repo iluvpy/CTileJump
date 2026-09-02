@@ -14,3 +14,4 @@ void p_utilInitRandom();
 int random_int(int min, int max);
 bool rect_collision(SDL_Rect r1, SDL_Rect r2);
 bool isPointInRect(int x, int y, SDL_Rect r);
+void drawThickRect(SDL_Renderer *renderer, SDL_Rect r, int thickness);

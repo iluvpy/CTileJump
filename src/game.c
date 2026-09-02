@@ -1,6 +1,8 @@
 #include "game.h"
 
 
+const SDL_Color BACKGROUND_COLOR = {200, 200, 200, 255};
+
 void initGame(GameData *game, GameEvents *events, TileHandler *tile_handler) {
     game->quit = false;
 
@@ -48,7 +50,12 @@ int gameLoop(GameData *game) {
         game->quit = game->events->quit; /* check if quit */
 
         /* set white background */
-        SDL_SetRenderDrawColor(game->renderer, 255, 255, 255, 255); 
+        SDL_SetRenderDrawColor(
+            game->renderer, 
+            BACKGROUND_COLOR.r, 
+            BACKGROUND_COLOR.g, 
+            BACKGROUND_COLOR.b, 
+            BACKGROUND_COLOR.a); 
         SDL_RenderClear(game->renderer);
 
         /* rendering happens here */ 

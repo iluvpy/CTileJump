@@ -1,7 +1,16 @@
 #include "tiles.h"
 
-#include "util.h"
-#include "debug.h"
+const int TILE_HEIGHT = 5;
+const int TILE_WIDTH = 20;
+const int TILE_R = 100;
+const int TILE_G = 100;
+const int TILE_B = 100;
+const int TILE_A = 255;
+
+const int TILE_X_MAX_DIST = 20;
+const int TILE_X_MIN_DIST = 20;
+const int TILE_Y_MAX_DIST = 40;
+const int TILE_Y_MIN_DIST = 20;
 
 const int TILES_PADDING = 20;
 const int TILE_SPEED = 100; /* pixels per second*/
@@ -36,7 +45,7 @@ void drawTiles(TileHandler *tile_handler, SDL_Renderer *renderer) {
         fillGameRect(tile_handler->tiles[i], renderer);
         
         ON_DEBUG(
-            SDL_Rect collision = getTileCollisionRect(tile_handler->tiles[i]);
+            SDL_Rect collision = getTileJumpingCollisionRect(tile_handler->tiles[i]);
             SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
             SDL_RenderDrawRect(renderer, &collision);
         )
@@ -72,8 +81,11 @@ void updateTileHandler(TileHandler *tile_handler, double dt) {
 
     for (int i = 0; i < tile_handler->count; i++) {
         GameRect *tile = getTile(tile_handler, i);
-        tile->y += TILE_SPEED * dt;
-
+        
+        #ifndef NO_TILE_MOVEMENT /* debug.h */
+            tile->y += TILE_SPEED * dt;
+        #endif
+        
         if (tile->y > WINDOW_HEIGHT && i == 0) {
             /* this tile is always i=0*/
             /* move array memory by +1*/
@@ -143,7 +155,7 @@ GameRect *getTile(TileHandler *tile_handler, u_int32_t index) {
 }
 
 /* the collision rect stands a little bit above the actually visible tile */
-SDL_Rect getTileCollisionRect(GameRect *tile) {
+SDL_Rect getTileJumpingCollisionRect(GameRect *tile) {
     SDL_Rect collision_rect = {
         tile->x - 5,
         tile->y - TILE_HEIGHT,

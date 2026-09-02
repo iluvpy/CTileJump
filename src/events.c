@@ -30,6 +30,7 @@ void updateGameEvents(GameEvents *game_events) {
         }
 
         if (event.type == SDL_KEYUP) {
+            printf("oh keyup!!\n");
             if (event.key.keysym.sym == SDLK_a) {
                 game_events->released_left = true;
                 game_events->holdLeft = false;
