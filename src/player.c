@@ -38,7 +38,7 @@ const char MOVE_RIGHT = 2;
 const char MOVE_UP = 3;
 
 /* physics */
-const double PLAYER_GRAVITY = 300; 
+const double PLAYER_GRAVITY = 400; 
 const double PLAYER_JUMP_SPEED = 300; /* pixels/second */
 const double PLAYER_DECELERATION = .2; /* lose 80% of velocity when releasing A or D key */
 
@@ -114,37 +114,43 @@ void updatePlayer(Player *player, TileHandler *tile_handler, GameEvents *events,
     p_updatePlayerGravity(player, dt);
     
     // calculate next player position based on velocity (dx, dy) and time passed in last frame
-    double new_x = p_calcNextPlayerPos(player->x, player->dx, dt); 
-    double new_y = p_calcNextPlayerPos(player->y, player->dy, dt);
+    double next_x = p_calcNextPlayerPos(player->x, player->dx, dt); 
+    double next_y = p_calcNextPlayerPos(player->y, player->dy, dt);
 
 
     if (p_playerInsindeGameWin(
-        new_x, 
+        next_x, 
         player->y, 
         player->collision_rect.w, 
         player->collision_rect.h
     )) {
-        player->x = new_x;
+        player->x = next_x;
     }
 
     if (p_playerInsindeGameWin(
         player->x, 
-        new_y,
+        next_y,
         player->collision_rect.w,
         player->collision_rect.h
     )) {
-        player->y = new_y;
-    } else if (new_y <= 0) { /* player has hit the top of the window */
+        if (player->can_fall)
+            player->y = next_y;
+        else if (player->dy < 0)
+            player->y = next_y;
+
+    } else if (next_y <= 0) { /* player has hit the top of the window */
         player->dy = 0;
     }
 
     /* if player can jump */
     player->can_jump = p_canPlayerJump(player, tile_handler);
+    player->can_jump = true;
+
+    player->is_falling = p_playerIsFalling(player);
 
     SDL_Rect next_collision_rect = player->collision_rect;
-    next_collision_rect.x = new_x;
-    next_collision_rect.x = new_y;
-
+    next_collision_rect.x = next_x;
+    next_collision_rect.y = next_y;
     /* disable/enable gravity */
     player->can_fall = p_canPlayerFall(next_collision_rect, tile_handler);
 
@@ -161,7 +167,7 @@ void updatePlayer(Player *player, TileHandler *tile_handler, GameEvents *events,
     player->collision_rect.x = (int)player->x;
     player->collision_rect.y = (int)player->y;
 
-    player->is_moving = p_playerIsMoving(player);
+
 }
 
 
@@ -211,7 +217,7 @@ void p_movePlayer(Player *player, char direction) {
 }
 
 void p_updatePlayerGravity(Player *player, double dt) {
-    if (!player->can_fall) return;
+    if (!player->can_fall && p_playerIsFalling(player)) return;
     double new_dy = player->dy + PLAYER_GRAVITY * dt;
     if (new_dy <= MAX_PLAYER_SPEED_Y) {
         player->dy = new_dy;
@@ -234,10 +240,10 @@ bool p_canPlayerFall(SDL_Rect next_collision_rect, TileHandler *tile_handler) {
     for (int i = 0; i < tile_handler->count; i++) {
         GameRect *tile = getTile(tile_handler, i);
         
-        SDL_Rect r = getTileJumpingCollisionRect(tile);
-        r.y -= TILE_HEIGHT;
+        SDL_Rect r = gRectGetSDLRect(tile);
 
         if (rect_collision(r, next_collision_rect)) {
+            printf("player cannot fall, tile index: %d\n", i);
             return false;
         }
     }
@@ -262,10 +268,13 @@ bool p_canPlayerJump(Player *player, TileHandler *tile_handler) {
     return false;
 }
 
-bool p_playerIsMoving(Player *player) {
-
-    return abs((int)(player->dx * 10)) == 0 && abs((int)(player->dy * 10)) == 0;
+bool p_playerIsFalling(Player *player) {
+    return player->dy > 0;
 }
+
+// bool p_playerIsMoving(Player *player) {
+//     return abs((int)(player->dx * 10)) == 0 && abs((int)(player->dy * 10)) == 0;
+// }
 
 SDL_Rect p_getPlayerCollisionRect(Player *player) {
     SDL_Rect collision_rect;

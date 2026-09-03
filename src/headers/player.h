@@ -24,6 +24,7 @@ typedef struct {
     bool can_fall;
     bool should_jump;
     bool is_moving;
+    bool is_falling;
     SDL_Rect collision_rect;
     Image *sprite_sheet;
 } Player;
@@ -39,8 +40,9 @@ void p_updatePlayerGravity(Player *player, double dt);
 
 bool p_playerInsindeGameWin(double x, double y, double w, double h);
 bool p_canPlayerFall(SDL_Rect next_collision_rect, TileHandler *tile_handler);
+bool p_playerIsFalling(Player *player);
 bool p_canPlayerJump(Player *player, TileHandler *tile_handler);
-bool p_playerIsMoving(Player *player);
+// bool p_playerIsMoving(Player *player);
 SDL_Rect p_getPlayerCollisionRect(Player *player);
 
 void p_destroyPlayer(Player *player);
