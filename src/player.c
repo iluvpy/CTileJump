@@ -242,14 +242,16 @@ bool p_playerInsindeGameWin(double x, double y, double w, double h) {
 */
 
 bool p_canPlayerFall(SDL_Rect next_collision_rect, TileHandler *tile_handler) {
+    
+    next_collision_rect.y += next_collision_rect.h - PLAYER_FEET_HEIGHT;
+    next_collision_rect.h = PLAYER_FEET_HEIGHT;
 
     for (int i = 0; i < tile_handler->count; i++) {
         GameRect *tile = getTile(tile_handler, i);
         
         SDL_Rect r = gRectGetSDLRect(tile);
 
-        next_collision_rect.y += next_collision_rect.h - PLAYER_FEET_HEIGHT;
-        next_collision_rect.h = PLAYER_FEET_HEIGHT;
+
 
         if (rect_collision(r, next_collision_rect)) {
             return false;
