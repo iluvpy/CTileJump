@@ -13,7 +13,6 @@ const int TILE_Y_MAX_DIST = 40;
 const int TILE_Y_MIN_DIST = 20;
 
 const int TILES_PADDING = 20;
-const int TILE_SPEED = 100; /* pixels per second*/
 const int INITIAL_TILE_HEIGHT = WINDOW_HEIGHT - 50;
 
 void initTileHandler(TileHandler *tile_handler) {

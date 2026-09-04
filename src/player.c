@@ -32,15 +32,20 @@ const int PLAYER_IMAGE_H_OFFSET = -22;
 const int ACTUAL_PLAYER_WIDTH = PLAYER_SPRITE_WIDTH_HEIGHT + PLAYER_IMAGE_W_OFFSET;
 const int ACTUAL_PLAYER_HEIGHT = PLAYER_SPRITE_WIDTH_HEIGHT + PLAYER_IMAGE_H_OFFSET;
 
+const int PLAYER_FEET_HEIGHT = 3;
+
 /* current direction the player is accelerating toward*/
 const char MOVE_LEFT = 1;
 const char MOVE_RIGHT = 2;
 const char MOVE_UP = 3;
 
 /* physics */
-const double PLAYER_GRAVITY = 400; 
+const double PLAYER_BASE_DOWN_VELOCITY = TILE_SPEED;
+const double PLAYER_GRAVITY = 400 - PLAYER_BASE_DOWN_VELOCITY; 
+
 const double PLAYER_JUMP_SPEED = 300; /* pixels/second */
 const double PLAYER_DECELERATION = .2; /* lose 80% of velocity when releasing A or D key */
+
 
 Player *createPlayer(SDL_Renderer *renderer) {
     Player *new_player = malloc(sizeof(Player));
@@ -60,6 +65,7 @@ Player *createPlayer(SDL_Renderer *renderer) {
     new_player->can_jump = false;
     new_player->can_fall = true;
     new_player->is_moving = false;
+    new_player->standing_on = NULL;
 
     SDL_Rect collision_rect;
     collision_rect.x = new_player->x;
@@ -114,9 +120,10 @@ void updatePlayer(Player *player, TileHandler *tile_handler, GameEvents *events,
     p_updatePlayerGravity(player, dt);
     
     // calculate next player position based on velocity (dx, dy) and time passed in last frame
-    double next_x = p_calcNextPlayerPos(player->x, player->dx, dt); 
-    double next_y = p_calcNextPlayerPos(player->y, player->dy, dt);
+    double next_x = player->x + player->dx * dt; 
+    double next_y = player->y + player->dy * dt;
 
+    next_y += PLAYER_BASE_DOWN_VELOCITY * dt; /* base speed is = tile speed */
 
     if (p_playerInsindeGameWin(
         next_x, 
@@ -133,24 +140,24 @@ void updatePlayer(Player *player, TileHandler *tile_handler, GameEvents *events,
         player->collision_rect.w,
         player->collision_rect.h
     )) {
-        if (player->can_fall)
+        if (player->can_fall || !p_playerIsFalling(player))  {
             player->y = next_y;
-        else if (player->dy < 0)
-            player->y = next_y;
-
+        }
     } else if (next_y <= 0) { /* player has hit the top of the window */
         player->dy = 0;
     }
 
     /* if player can jump */
     player->can_jump = p_canPlayerJump(player, tile_handler);
-    player->can_jump = true;
+    // player->can_jump = true;
 
     player->is_falling = p_playerIsFalling(player);
 
     SDL_Rect next_collision_rect = player->collision_rect;
     next_collision_rect.x = next_x;
     next_collision_rect.y = next_y;
+
+
     /* disable/enable gravity */
     player->can_fall = p_canPlayerFall(next_collision_rect, tile_handler);
 
@@ -175,7 +182,6 @@ void p_handlePlayerInput(Player *player, GameEvents *events) {
 
     if (events->pressed_space && player->can_jump) {
         player->should_jump = true;
-        printf("space was pressed.\n");
     }
 
     
@@ -242,8 +248,10 @@ bool p_canPlayerFall(SDL_Rect next_collision_rect, TileHandler *tile_handler) {
         
         SDL_Rect r = gRectGetSDLRect(tile);
 
+        next_collision_rect.y += next_collision_rect.h - PLAYER_FEET_HEIGHT;
+        next_collision_rect.h = PLAYER_FEET_HEIGHT;
+
         if (rect_collision(r, next_collision_rect)) {
-            printf("player cannot fall, tile index: %d\n", i);
             return false;
         }
     }
@@ -251,9 +259,7 @@ bool p_canPlayerFall(SDL_Rect next_collision_rect, TileHandler *tile_handler) {
     return true;
 }
 
-double p_calcNextPlayerPos(double oldPos, double speed, double dt) {
-    return oldPos + dt * speed; 
-}
+
 
 bool p_canPlayerJump(Player *player, TileHandler *tile_handler) {
     
@@ -272,16 +278,24 @@ bool p_playerIsFalling(Player *player) {
     return player->dy > 0;
 }
 
-// bool p_playerIsMoving(Player *player) {
-//     return abs((int)(player->dx * 10)) == 0 && abs((int)(player->dy * 10)) == 0;
-// }
+bool p_playerIsMoving(Player *player) {
+    return !p_isPlayerMovingLeft(player) && !p_isPlayerMovingRight(player);
+}
+
+bool p_isPlayerMovingLeft(Player *player) {
+    return abs((int)(player->dx * 10)) == 0;
+}
+
+bool p_isPlayerMovingRight(Player *player) {
+    return abs((int)(player->dy * 10)) == 0;
+}
 
 SDL_Rect p_getPlayerCollisionRect(Player *player) {
     SDL_Rect collision_rect;
     collision_rect.x = player->x;
     collision_rect.y = player->y;
-    collision_rect.w = PLAYER_SPRITE_WIDTH_HEIGHT + PLAYER_IMAGE_W_OFFSET;
-    collision_rect.h = PLAYER_SPRITE_WIDTH_HEIGHT + PLAYER_IMAGE_H_OFFSET;
+    collision_rect.w = ACTUAL_PLAYER_WIDTH;
+    collision_rect.h = ACTUAL_PLAYER_HEIGHT;
     return collision_rect;
 }
 

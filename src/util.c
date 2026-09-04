@@ -15,12 +15,12 @@ int random_int(int min, int max) {
     return (rand() % max) + min;
 }
 
-bool rect_collision(SDL_Rect r1, SDL_Rect r2) { 
-    /* check if one point of the corners of r1 is inside of r2 */
-    return r1.x < r2.x + r2.w &&
-           r1.x + r1.w > r2.x &&
-           r1.y < r2.y + r2.h &&
-           r1.y + r1.h > r2.y;
+/* used to detect new collisions, not overlapping*/
+bool rect_collision(SDL_Rect a, SDL_Rect b) {
+    return a.x < b.x + b.w &&
+           a.x + a.w > b.x &&
+           a.y < b.y + b.h &&
+           a.y + a.h > b.y;
 }
 
 bool isPointInRect(int x, int y, SDL_Rect r) {

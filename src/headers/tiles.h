@@ -24,6 +24,7 @@ extern const int TILE_X_MIN_DIST;
 extern const int TILE_Y_MAX_DIST;
 extern const int TILE_Y_MIN_DIST;
 
+#define TILE_SPEED 100
 
 typedef struct {
     GameRect **tiles; 

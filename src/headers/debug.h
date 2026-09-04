@@ -6,16 +6,10 @@
     #define DEBUG /* TODO comment out to delete debug messages */
 #endif
 
-// #ifndef DEBUG_CODE   /* TODO comment out to remove extra debug info*/
-//     #define DEBUG_CODE
-// #endif
-
-#if defined(DEBUG_CODE) && !defined(ON_DEBUG)
+/* comment out specific debug code (mostly used for rendering useful visualizations)*/
+#ifndef DEBUG_CODE 
     #define ON_DEBUG(code) code
     #define DEBUG_LINE_THICKNESS 4
-#else 
-    #define ON_DEBUG(nothing)
-    #define DEBUG_LINE_THICKNESS
 #endif
 
 #ifdef DEBUG
