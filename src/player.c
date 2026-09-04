@@ -291,17 +291,7 @@ bool p_playerIsFalling(Player *player) {
     return player->dy > 0;
 }
 
-bool p_playerIsMoving(Player *player) {
-    return !p_isPlayerMovingLeft(player) && !p_isPlayerMovingRight(player);
-}
 
-bool p_isPlayerMovingLeft(Player *player) {
-    return abs((int)(player->dx * 10)) == 0;
-}
-
-bool p_isPlayerMovingRight(Player *player) {
-    return abs((int)(player->dy * 10)) == 0;
-}
 
 SDL_Rect p_getPlayerCollisionRect(Player *player) {
     SDL_Rect collision_rect;
