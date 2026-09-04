@@ -13,26 +13,34 @@ const int PLAYER_SPRITE_WIDTH_HEIGHT = 64;
 
 const int MAX_PLAYER_SPEED_X = 200; /* pixels/second */
 const int MAX_PLAYER_SPEED_Y = 800; /* pixels/second */
-const float SPRITE_SCALE = .2f;
 
 
 /* PLAYER-IMAGE X,Y,W,H OFFSETS
    since part of the texture is transparent these are needed
 */
 
-// const float OFFSET_CREATED_AT_SCALE = .2; /* DO NOT TOUCH THIS*/
-const int PLAYER_IMAGE_X_OFFSET = 10;
-const int PLAYER_IMAGE_Y_OFFSET = 7; 
-const int PLAYER_IMAGE_W_OFFSET = -35;
-const int PLAYER_IMAGE_H_OFFSET = -22;
+/* ============================================================
+   THE ONE KNOB — change this to resize the player.
+   1.0f = current default size, 1.5f = 150%, 0.5f = 50%, etc.
+   ============================================================ */
+const float PLAYER_SIZE_PERCENT = 1.0f;
 
-// change this to change sprite scale
+/* ---- base values, tuned by eye at PLAYER_SIZE_PERCENT == 1.0 ---- */
+const float BASE_SPRITE_SCALE          = .2f;
+const int   BASE_PLAYER_IMAGE_X_OFFSET = 10;
+const int   BASE_PLAYER_IMAGE_Y_OFFSET = 7;
+const int   BASE_ACTUAL_PLAYER_WIDTH   = 29; 
+const int   BASE_ACTUAL_PLAYER_HEIGHT  = 42; 
+const int   BASE_PLAYER_FEET_HEIGHT    = 3;
 
-
-const int ACTUAL_PLAYER_WIDTH = PLAYER_SPRITE_WIDTH_HEIGHT + PLAYER_IMAGE_W_OFFSET;
-const int ACTUAL_PLAYER_HEIGHT = PLAYER_SPRITE_WIDTH_HEIGHT + PLAYER_IMAGE_H_OFFSET;
-
-const int PLAYER_FEET_HEIGHT = 3;
+/* ---- derived values — these are what the rest of the file uses ---- */
+const float SPRITE_SCALE          = BASE_SPRITE_SCALE          * PLAYER_SIZE_PERCENT;
+const int   PLAYER_IMAGE_X_OFFSET = (int)(BASE_PLAYER_IMAGE_X_OFFSET * PLAYER_SIZE_PERCENT);
+const int   PLAYER_IMAGE_Y_OFFSET = (int)(BASE_PLAYER_IMAGE_Y_OFFSET * PLAYER_SIZE_PERCENT);
+const int   ACTUAL_PLAYER_WIDTH   = (int)(BASE_ACTUAL_PLAYER_WIDTH   * PLAYER_SIZE_PERCENT);
+const int   ACTUAL_PLAYER_HEIGHT  = (int)(BASE_ACTUAL_PLAYER_HEIGHT  * PLAYER_SIZE_PERCENT);
+const int   PLAYER_FEET_HEIGHT    = (int)(BASE_PLAYER_FEET_HEIGHT    * PLAYER_SIZE_PERCENT) > 0
+                                     ? (int)(BASE_PLAYER_FEET_HEIGHT * PLAYER_SIZE_PERCENT) : 1;
 
 /* current direction the player is accelerating toward*/
 const char MOVE_LEFT = 1;

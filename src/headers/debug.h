@@ -6,9 +6,9 @@
     #define DEBUG /* TODO comment out to delete debug messages */
 #endif
 
-/* comment out specific debug code (mostly used for rendering useful visualizations)*/
+/* comment out "code" to remove specific debug code (mostly used for rendering useful visualizations)*/
 #ifndef DEBUG_CODE 
-    #define ON_DEBUG(code) code
+    #define ON_DEBUG(code) //code /* <- 'code' */
     #define DEBUG_LINE_THICKNESS 4
 #endif
 
