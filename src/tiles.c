@@ -113,7 +113,7 @@ void p_updateTileCount(TileHandler *tile_handler, int count) {
         DEBUG_STR("p_updateTileCount had invalid count update argument!\n");
         return;
     }
-    GameRect **new_tiles = realloc(tile_handler->tiles, sizeof(GameRect) * count);
+    GameRect **new_tiles = realloc(tile_handler->tiles, sizeof(GameRect*) * count);
     tile_handler->tiles = new_tiles;
     tile_handler->count = count;
 }
@@ -124,7 +124,7 @@ void p_addTile(TileHandler *tile_handler, int x, int y) {
     int new_count = tile_handler->count + 1;
     p_updateTileCount(tile_handler, new_count);
 
-    GameRect **new_tiles = realloc(tile_handler->tiles, sizeof(GameRect) * new_count);
+    GameRect **new_tiles = realloc(tile_handler->tiles, sizeof(GameRect*) * new_count);
     SDL_Color tile_color = {
         TILE_R,
         TILE_G,

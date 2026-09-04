@@ -44,7 +44,7 @@ const double PLAYER_BASE_DOWN_VELOCITY = TILE_SPEED;
 const double PLAYER_GRAVITY = 400 - PLAYER_BASE_DOWN_VELOCITY; 
 
 const double PLAYER_JUMP_SPEED = 300; /* pixels/second */
-const double PLAYER_DECELERATION = .2; /* lose 80% of velocity when releasing A or D key */
+const double PLAYER_DECELERATION = .98; /* lose 80% of velocity when releasing A or D key */
 
 
 Player *createPlayer(SDL_Renderer *renderer) {
@@ -116,6 +116,14 @@ void updatePlayer(Player *player, TileHandler *tile_handler, GameEvents *events,
     /* key presses */
     p_handlePlayerInput(player, events);
 
+    /* friction: runs continuously whenever neither direction is held */
+    if (!events->holdLeft && !events->holdright) {
+        player->dx *= PLAYER_DECELERATION;
+        if (fabs(player->dx) < 1.0) {
+            player->dx = 0;
+        }
+    }
+
     /* physics */
     p_updatePlayerGravity(player, dt);
     
@@ -147,6 +155,7 @@ void updatePlayer(Player *player, TileHandler *tile_handler, GameEvents *events,
         player->dy = 0;
     }
 
+
     /* if player can jump */
     player->can_jump = p_canPlayerJump(player, tile_handler);
     // player->can_jump = true;
@@ -159,7 +168,7 @@ void updatePlayer(Player *player, TileHandler *tile_handler, GameEvents *events,
 
 
     /* disable/enable gravity */
-    player->can_fall = p_canPlayerFall(next_collision_rect, tile_handler);
+    player->can_fall = p_canPlayerFall(player, next_collision_rect, tile_handler);
 
     /* 
        update the player sprite position on screen adjusting with offset, 
@@ -198,9 +207,6 @@ void p_handlePlayerInput(Player *player, GameEvents *events) {
         p_movePlayer(player, MOVE_RIGHT);
     }
 
-    if (events->released_left || events->released_right) {
-        player->dx *= PLAYER_DECELERATION;
-    }
 }
 
 
@@ -241,25 +247,30 @@ bool p_playerInsindeGameWin(double x, double y, double w, double h) {
     if the next player position (of the next frame) collides with the actual tile (not collision rect)
 */
 
-bool p_canPlayerFall(SDL_Rect next_collision_rect, TileHandler *tile_handler) {
-    
-    next_collision_rect.y += next_collision_rect.h - PLAYER_FEET_HEIGHT;
-    next_collision_rect.h = PLAYER_FEET_HEIGHT;
+bool p_canPlayerFall(Player *player, SDL_Rect next_collision_rect, TileHandler *tile_handler) {
+    if (p_isPlayerJumping(player)) return true; /* only tiles matter while moving downward */
+
+    SDL_Rect next_player_feet_rect = p_getPlayerFeetRect(next_collision_rect);  
 
     for (int i = 0; i < tile_handler->count; i++) {
         GameRect *tile = getTile(tile_handler, i);
         
         SDL_Rect r = gRectGetSDLRect(tile);
-
-
-
-        if (rect_collision(r, next_collision_rect)) {
+        if (rect_collision(r, next_player_feet_rect)) {
             return false;
         }
     }
 
     return true;
 }
+
+SDL_Rect p_getPlayerFeetRect(SDL_Rect player_rect) {
+    SDL_Rect feet = player_rect;
+    feet.y = player_rect.y + player_rect.h - PLAYER_FEET_HEIGHT;
+    feet.h = PLAYER_FEET_HEIGHT;
+    return feet;
+}
+
 
 
 
@@ -299,6 +310,9 @@ SDL_Rect p_getPlayerCollisionRect(Player *player) {
     collision_rect.w = ACTUAL_PLAYER_WIDTH;
     collision_rect.h = ACTUAL_PLAYER_HEIGHT;
     return collision_rect;
+}
+bool p_isPlayerJumping(Player *player) {
+    return player->dy <= 0;
 }
 
 

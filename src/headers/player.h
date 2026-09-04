@@ -40,12 +40,14 @@ void p_handlePlayerInput(Player *player, GameEvents *events);
 void p_updatePlayerGravity(Player *player, double dt);
 
 bool p_playerInsindeGameWin(double x, double y, double w, double h);
-bool p_canPlayerFall(SDL_Rect next_collision_rect, TileHandler *tile_handler);
+bool p_canPlayerFall(Player *player, SDL_Rect next_collision_rect, TileHandler *tile_handler);
 bool p_playerIsFalling(Player *player);
+bool p_playerIsMoving(Player *player);
 bool p_isPlayerMovingLeft(Player *player);
 bool p_isPlayerMovingRight(Player *player);
 bool p_canPlayerJump(Player *player, TileHandler *tile_handler);
 bool p_isPlayerJumping(Player *player);
+SDL_Rect p_getPlayerFeetRect(SDL_Rect player_rect);
 // bool p_playerIsMoving(Player *player);
 SDL_Rect p_getPlayerCollisionRect(Player *player);
 
