@@ -15,17 +15,15 @@ const int MAX_PLAYER_SPEED_X = 200; /* pixels/second */
 const int MAX_PLAYER_SPEED_Y = 800; /* pixels/second */
 
 
-/* PLAYER-IMAGE X,Y,W,H OFFSETS
-   since part of the texture is transparent these are needed
-*/
 
 /* ============================================================
-   THE ONE KNOB — change this to resize the player.
+   change this to resize the player.
    1.0f = current default size, 1.5f = 150%, 0.5f = 50%, etc.
    ============================================================ */
 const float PLAYER_SIZE_PERCENT = 1.0f;
 
 /* ---- base values, tuned by eye at PLAYER_SIZE_PERCENT == 1.0 ---- */
+/* changing character spritesheet means having to retune values together with debug rendering */
 const float BASE_SPRITE_SCALE          = .2f;
 const int   BASE_PLAYER_IMAGE_X_OFFSET = 10;
 const int   BASE_PLAYER_IMAGE_Y_OFFSET = 7;
@@ -62,7 +60,7 @@ Player *createPlayer(SDL_Renderer *renderer) {
     new_player->sprite_sheet = new_sprite_sheet;   
     setImageScale(new_player->sprite_sheet, SPRITE_SCALE);
 
-    new_player->current_sprite_indexI = 0;
+    new_player->current_sprite_indexI = 1;
     new_player->current_sprite_indexJ = 0;
 
     new_player->x = PLAYER_IMAGE_X_OFFSET;
@@ -70,10 +68,12 @@ Player *createPlayer(SDL_Renderer *renderer) {
 
     new_player->dx = 0;
     new_player->dy = 0;
+    new_player->speed_mlt = 1.0f;
+
     new_player->can_jump = false;
     new_player->can_fall = true;
     new_player->is_moving = false;
-    new_player->standing_on = NULL;
+    // new_player->standing_on = NULL;
 
     SDL_Rect collision_rect;
     collision_rect.x = new_player->x;
@@ -136,8 +136,8 @@ void updatePlayer(Player *player, TileHandler *tile_handler, GameEvents *events,
     p_updatePlayerGravity(player, dt);
     
     // calculate next player position based on velocity (dx, dy) and time passed in last frame
-    double next_x = player->x + player->dx * dt; 
-    double next_y = player->y + player->dy * dt;
+    double next_x = player->x + player->dx * player->speed_mlt * dt; 
+    double next_y = player->y + player->dy * player->speed_mlt * dt;
 
     next_y += PLAYER_BASE_DOWN_VELOCITY * dt; /* base speed is = tile speed */
 
@@ -320,6 +320,21 @@ void p_destroyPlayer(Player *player) {
         return;
     }
     
-    free(player->sprite_sheet);
+    destroyImage(player->sprite_sheet);
     free(player);
+}
+
+
+
+/*
+
+
+=======================================
+PLAYER ANIMATION HANDLER CODE FROM HERE
+=======================================
+
+*/
+
+void initPlayerAnimationHandler(PlayerAnimationHandler *pl_animation) {
+    pl_animation->time_since_last_step = 0.0;
 }

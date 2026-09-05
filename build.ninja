@@ -5,7 +5,7 @@ rule cc
   command = $cc -c $in -o $out $cflags
 
 rule link
-  command = $cc $in -o $out -lSDL2 -lSDL2_image
+  command = $cc $in -o $out -lSDL2 -lSDL2_image 
 
 build obj/game.o: cc src/game.c  
 build obj/events.o: cc src/events.c  

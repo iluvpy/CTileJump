@@ -4,6 +4,7 @@
 
 typedef struct {
     double dt;
+    double total; /* total time passed since game start*/
     struct timespec start, end;
 } TimeHandler;
 

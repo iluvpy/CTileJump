@@ -11,6 +11,7 @@ TimeHandler *createTimeHandler() {
     
     TimeHandler *new_time_handler = malloc(sizeof(TimeHandler));
     new_time_handler->dt = 0;
+    new_time_handler->total = 0;
     return new_time_handler;
 }
 
@@ -19,12 +20,13 @@ void dt_start(TimeHandler *time_handler) {
 }
 
 /* DO NOT TOUCH, BREAKS EVERYTIME */
-void dt_end(TimeHandler *time_handler) {
+void dt_end(TimeHandler *time_handler) { 
     clock_gettime(CLOCK_MONOTONIC, &time_handler->end);
     time_handler->dt = (time_handler->end.tv_sec - time_handler->start.tv_sec) * 1000.0 +
                           (time_handler->end.tv_nsec - time_handler->start.tv_nsec) / 1.0e6;
     
     time_handler->dt /= 1000;
+    time_handler->total += time_handler->dt; /* add time passed this frame*/
 }
 
 void destroyTimeHandler(TimeHandler *handler) {

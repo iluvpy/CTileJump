@@ -10,6 +10,4 @@
 - timehandler.h/c uses weird stdlib stuff that likely wont work on other operating systems
 
 ### TODO
-- tile-player collision + jump only when on tile
-- tile downward movement
 - player movement animations
