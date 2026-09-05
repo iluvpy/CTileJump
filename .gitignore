@@ -61,4 +61,4 @@ build/tile-jump
 obj
 out.txt
 
-ninja.log
+*.ninja_log
